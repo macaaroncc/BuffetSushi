@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BuffetSushi</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div id="app">
+        <!-- Vista de Escaneo QR -->
+        <div id="qr-scan-view" class="view active">
+            <div class="container">
+                <div class="header">
+                    <h1 class="logo">BuffetSushi</h1>
+                    <p class="subtitle">Experiencia gastronómica japonesa</p>
+                </div>
+                
+                <div class="qr-section">
+                    <div class="qr-icon">
+                        <i class="fas fa-qrcode"></i>
+                    </div>
+                    <h2>Escanea el código QR de tu mesa</h2>
+                    <p>Para acceder al menú, utiliza únicamente el código QR de tu mesa</p>
+                    
+                    <div class="qr-info">
+                        <div class="info-box">
+                            <i class="fas fa-info-circle"></i>
+                            <p>Cada mesa tiene un código QR único. No es posible acceder manualmente.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Vista de Configuración de Mesa -->
+        <div id="mesa-config-view" class="view">
+            <div class="container">
+                <div class="header">
+                    <h1 class="logo">BuffetSushi</h1>
+                    <div class="mesa-info">
+                        <i class="fas fa-chair"></i>
+                        <span>Mesa <span id="current-mesa-number"></span></span>
+                    </div>
+                </div>
+                
+                <div class="config-section">
+                    <h2>¿Cuántas personas sois?</h2>
+                    
+                    <div class="persona-counter">
+                        <button class="counter-btn" id="decrease-personas">
+                            <i class="fas fa-minus"></i>
+                        </button>
+                        <div class="counter-display">
+                            <span id="personas-counter">1</span>
+                            <div class="counter-label">Personas</div>
+                        </div>
+                        <button class="counter-btn" id="increase-personas">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                    </div>
+                    
+                    <button id="confirm-personas-btn" class="btn-primary">
+                        <i class="fas fa-check"></i>
+                        Confirmar
+                    </button>
+                    
+                    <div class="info-box">
+                        <i class="fas fa-info-circle"></i>
+                        <p>Límite de 5 platos por persona por tanda</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Vista del Menú -->
+        <div id="menu-view" class="view">
+            <div class="container">
+                <div class="header">
+                    <h1 class="logo">BuffetSushi</h1>
+                    <div class="mesa-info">
+                        <i class="fas fa-chair"></i>
+                        <span>Mesa <span id="menu-mesa-number"></span></span>
+                        <div class="personas-info">
+                            <i class="fas fa-users"></i>
+                            <span id="personas-count"></span> personas
+                        </div>
+                    </div>
+                </div>
+
+                <div class="menu-controls">
+                    <div class="platos-counter">
+                        <span>Platos seleccionados: </span>
+                        <span id="platos-selected">0</span>
+                        <span>/</span>
+                        <span id="platos-limit">5</span>
+                    </div>
+                    
+                    <div class="menu-tabs">
+                        <button class="tab-btn active" data-category="all">Todos</button>
+                        <button class="tab-btn" data-category="nigiri">Nigiri</button>
+                        <button class="tab-btn" data-category="maki">Maki</button>
+                        <button class="tab-btn" data-category="sashimi">Sashimi</button>
+                        <button class="tab-btn" data-category="especiales">Especiales</button>
+                        <button class="tab-btn" data-category="postres">Postres</button>
+                    </div>
+                </div>
+
+                <div id="menu-items" class="menu-grid">
+                    <!-- Los items del menú se cargarán aquí -->
+                </div>
+
+                <div class="bottom-actions">
+                    <button id="unified-view-order-btn" class="btn-primary unified-order-btn" type="button" onclick="try{if(window.CartManager&&typeof CartManager.render==='function'){CartManager.render();}}catch(e){};try{if(window.Utils&&typeof Utils.showView==='function'){Utils.showView('cart-view');}else{var v=document.querySelectorAll('.view');for(var i=0;i<v.length;i++)v[i].classList.remove('active');var c=document.getElementById('cart-view');if(c)c.classList.add('active');}}catch(e){};return false;">
+                        <i class="fas fa-clipboard-list"></i>
+                        Ver Pedido
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Vista del Carrito -->
+        <div id="cart-view" class="view">
+            <div class="container">
+                <div class="header">
+                    <h1 class="logo">BuffetSushi</h1>
+                    <button id="back-to-menu-btn" class="back-btn">
+                        <i class="fas fa-arrow-left"></i>
+                        Volver al Menú
+                    </button>
+                </div>
+
+                <div class="cart-content">
+                    <h2>Tu Pedido Actual</h2>
+                    <div id="cart-items" class="cart-items">
+                        <!-- Items del carrito se cargarán aquí -->
+                    </div>
+                    
+                    <div class="cart-summary">
+                        <div class="summary-row">
+                            <span>Total de platos:</span>
+                            <span id="total-plates">0</span>
+                        </div>
+                    </div>
+                    
+                    <div class="cart-actions">
+                        <button id="clear-cart-btn" class="btn-secondary">
+                            <i class="fas fa-trash"></i>
+                            Limpiar Carrito
+                        </button>
+                        <button id="confirm-order-btn" class="btn-primary">
+                            <i class="fas fa-check"></i>
+                            Confirmar Pedido
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Vista del Historial -->
+        <div id="history-view" class="view">
+            <div class="container">
+                <div class="header">
+                    <h1 class="logo">BuffetSushi</h1>
+                    <div class="mesa-info">
+                        <i class="fas fa-chair"></i>
+                        <span>Mesa <span id="history-mesa-number"></span></span>
+                    </div>
+                </div>
+
+                <div class="history-content">
+                    <div class="history-header">
+                        <h2>Historial de Pedidos</h2>
+                        <button id="new-order-btn" class="btn-primary">
+                            <i class="fas fa-plus"></i>
+                            Nuevo Pedido
+                        </button>
+                    </div>
+                    
+                    <div id="order-history" class="order-history">
+                        <!-- Historial de pedidos se cargará aquí -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modales -->
+    <div id="loading-modal" class="modal">
+        <div class="modal-content">
+            <div class="loading-spinner"></div>
+            <p>Procesando pedido...</p>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

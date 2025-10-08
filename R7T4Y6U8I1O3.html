@@ -1,0 +1,1640 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BuffetSushi - Mesa 6</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div id="app">
+        <!-- Vista de Configuración de Mesa -->
+        <div id="mesa-config-view" class="view active">
+            <div class="container">
+                <div class="header">
+                    <h1 class="logo">BuffetSushi</h1>
+                    <div class="mesa-info">
+                        <i class="fas fa-chair"></i>
+                        <span>Mesa 6</span>
+                    </div>
+                </div>
+                
+                <div class="config-section">
+                    <h2>¿Cuántas personas sois?</h2>
+                    
+                    <div class="persona-counter">
+                        <button type="button" class="counter-btn" onclick="decreasePersonas()">
+                            <i class="fas fa-minus"></i>
+                        </button>
+                        <div class="counter-display">
+                            <span id="personas-counter">1</span>
+                            <div class="counter-label">Personas</div>
+                        </div>
+                        <button type="button" class="counter-btn" onclick="increasePersonas()">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="confirm-button-container">
+                        <button type="button" class="btn-primary" onclick="confirmPersonas()">
+                            <i class="fas fa-check"></i>
+                            Confirmar
+                        </button>
+                    </div>
+                    
+                    <div class="info-box">
+                        <i class="fas fa-info-circle"></i>
+                        <p>Límite de 5 platos por persona por tanda</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Vista del Menú -->
+        <div id="menu-view" class="view">
+            <div class="container">
+                <div class="header">
+                    <h1 class="logo">BuffetSushi</h1>
+                    <div class="mesa-info">
+                        <i class="fas fa-chair"></i>
+                        <span>Mesa 6</span>
+                        <div class="personas-info">
+                            <i class="fas fa-users"></i>
+                            <span id="personas-count"></span> personas
+                        </div>
+                    </div>
+                </div>
+
+                <div class="menu-controls">
+                    <div class="platos-counter">
+                        <span>Platos seleccionados: </span>
+                        <span id="platos-selected">0</span>
+                        <span>/</span>
+                        <span id="platos-limit">5</span>
+                    </div>
+                    
+                    <div class="menu-tabs">
+                        <button class="tab-btn active" onclick="filterByCategory('all')">Todos</button>
+                        <button class="tab-btn" onclick="filterByCategory('nigiri')">Nigiri</button>
+                        <button class="tab-btn" onclick="filterByCategory('maki')">Maki</button>
+                        <button class="tab-btn" onclick="filterByCategory('sashimi')">Sashimi</button>
+                        <button class="tab-btn" onclick="filterByCategory('especiales')">Especiales</button>
+                        <button class="tab-btn" onclick="filterByCategory('postres')">Postres</button>
+                    </div>
+                </div>
+
+                <div id="menu-items" class="menu-grid">
+                    <!-- Los items del menú se cargarán aquí -->
+                </div>
+
+                <div class="bottom-actions">
+                    <button class="btn-secondary" onclick="viewCart()">
+                        <i class="fas fa-shopping-cart"></i>
+                        Ver Pedido (<span id="cart-count">0</span>)
+                    </button>
+                    <button id="make-order-btn" class="btn-primary" onclick="makeOrder()" disabled>
+                        <i class="fas fa-paper-plane"></i>
+                        Realizar Pedido
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Vista del Carrito -->
+        <div id="cart-view" class="view">
+            <div class="container">
+                <div class="header">
+                    <h1 class="logo">BuffetSushi</h1>
+                    <button class="back-btn" onclick="backToMenu()">
+                        <i class="fas fa-arrow-left"></i>
+                        Volver al Menú
+                    </button>
+                </div>
+
+                <div class="cart-content">
+                    <h2>Tu Pedido Actual</h2>
+                    <div id="cart-items" class="cart-items">
+                        <!-- Items del carrito se cargarán aquí -->
+                    </div>
+                    
+                    <div class="cart-summary">
+                        <div class="summary-row">
+                            <span>Total de platos:</span>
+                            <span id="total-plates">0</span>
+                        </div>
+                    </div>
+                    
+                    <div class="cart-actions">
+                        <button class="btn-secondary" onclick="clearCart()">
+                            <i class="fas fa-trash"></i>
+                            Limpiar Pedido
+                        </button>
+                        <button class="btn-primary" onclick="confirmOrder()">
+                            <i class="fas fa-check"></i>
+                            Confirmar Pedido
+                        </button>
+                    </div>                    
+                    <!-- Historial de Pedidos en el Carrito -->
+                    <div class="cart-history-section">
+                        <h2>Historial de Pedidos</h2>
+                        <div id="cart-order-history" class="order-history">
+                            <!-- Historial de pedidos se cargara aqui -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Vista del Historial -->
+        <div id="history-view" class="view">
+            <div class="container">
+                <div class="header">
+                    <h1 class="logo">BuffetSushi</h1>
+                    <div class="mesa-info">
+                        <i class="fas fa-chair"></i>
+                        <span>Mesa 6</span>
+                    </div>
+                </div>
+
+                <div class="history-content">
+                    <div class="history-header">
+                        <h2>Historial de Pedidos</h2>
+                        <button class="btn-primary" onclick="newOrder()">
+                            <i class="fas fa-plus"></i>
+                            Nuevo Pedido
+                        </button>
+                    </div>
+                    
+                    <div id="order-history" class="order-history">
+                        <!-- Historial de pedidos se cargará aquí -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modales -->
+    <div id="loading-modal" class="modal">
+        <div class="modal-content">
+            <div class="loading-spinner"></div>
+            <p>Procesando pedido...</p>
+        </div>
+    </div>
+
+    <script>
+        // Variables globales específicas para Mesa 6
+        const MESA_NUMBER = 6;
+        const MESA_CODE = 'R7T4Y6U8I1O3';
+        let currentPersonas = 0;
+        let currentCart = [];
+        let orderHistory = [];
+        let currentOrderNumber = 1;
+        let platosLimit = 5;
+        let currentPersonasCount = 1;
+
+        // Base de datos de platos (50 platos diferentes)
+        const menuDatabase = [
+            // Nigiri (10 platos)
+            { id: 1, name: "Nigiri de Salmón", description: "Arroz sushi con salmón fresco", category: "nigiri" },
+            { id: 2, name: "Nigiri de Atún", description: "Arroz sushi con atún rojo", category: "nigiri" },
+            { id: 3, name: "Nigiri de Pulpo", description: "Arroz sushi con pulpo cocido", category: "nigiri" },
+            { id: 4, name: "Nigiri de Anguila", description: "Arroz sushi con anguila teriyaki", category: "nigiri" },
+            { id: 5, name: "Nigiri de Gamba", description: "Arroz sushi con gamba cocida", category: "nigiri" },
+            { id: 6, name: "Nigiri de Vieira", description: "Arroz sushi con vieira fresca", category: "nigiri" },
+            { id: 7, name: "Nigiri de Lubina", description: "Arroz sushi con lubina", category: "nigiri" },
+            { id: 8, name: "Nigiri de Caballa", description: "Arroz sushi con caballa marinada", category: "nigiri" },
+            { id: 9, name: "Nigiri de Hueva de Salmón", description: "Arroz sushi con ikura", category: "nigiri" },
+            { id: 10, name: "Nigiri de Pez Mantequilla", description: "Arroz sushi con hamachi", category: "nigiri" },
+
+            // Maki (15 platos)
+            { id: 11, name: "California Roll", description: "Cangrejo, aguacate y pepino", category: "maki" },
+            { id: 12, name: "Maki de Salmón", description: "Salmón fresco con arroz y nori", category: "maki" },
+            { id: 13, name: "Maki de Atún", description: "Atún rojo con arroz y alga nori", category: "maki" },
+            { id: 14, name: "Maki de Pepino", description: "Pepino fresco, ligero y crujiente", category: "maki" },
+            { id: 15, name: "Philadelphia Roll", description: "Salmón, queso crema y cebollino", category: "maki" },
+            { id: 16, name: "Spicy Tuna Roll", description: "Atún picante con mayonesa especial", category: "maki" },
+            { id: 17, name: "Dragon Roll", description: "Anguila, aguacate y tempura", category: "maki" },
+            { id: 18, name: "Rainbow Roll", description: "Varios pescados sobre california", category: "maki" },
+            { id: 19, name: "Tempura Roll", description: "Langostino en tempura y aguacate", category: "maki" },
+            { id: 20, name: "Volcano Roll", description: "Roll gratinado con salsa picante", category: "maki" },
+            { id: 21, name: "Alaska Roll", description: "Salmón, aguacate y pepino", category: "maki" },
+            { id: 22, name: "Boston Roll", description: "Langostino cocido y mayonesa", category: "maki" },
+            { id: 23, name: "Maki de Aguacate", description: "Aguacate cremoso con arroz", category: "maki" },
+            { id: 24, name: "Spider Roll", description: "Cangrejo de caparazón blando frito", category: "maki" },
+            { id: 25, name: "Tiger Roll", description: "Langostino tigre y salsa unagi", category: "maki" },
+
+            // Sashimi (10 platos)
+            { id: 26, name: "Sashimi de Salmón", description: "Salmón fresco cortado fino", category: "sashimi" },
+            { id: 27, name: "Sashimi de Atún", description: "Atún rojo de primera calidad", category: "sashimi" },
+            { id: 28, name: "Sashimi de Lubina", description: "Lubina fresca del día", category: "sashimi" },
+            { id: 29, name: "Sashimi de Pulpo", description: "Pulpo cocido en su punto", category: "sashimi" },
+            { id: 30, name: "Sashimi de Hamachi", description: "Pez mantequilla premium", category: "sashimi" },
+            { id: 31, name: "Sashimi de Caballa", description: "Caballa marinada tradicional", category: "sashimi" },
+            { id: 32, name: "Sashimi de Vieira", description: "Vieira fresca del océano", category: "sashimi" },
+            { id: 33, name: "Sashimi de Anguila", description: "Anguila con glaseado teriyaki", category: "sashimi" },
+            { id: 34, name: "Sashimi Mix", description: "Selección del chef de 5 pescados", category: "sashimi" },
+            { id: 35, name: "Sashimi de Dorada", description: "Dorada fresca mediterránea", category: "sashimi" },
+
+            // Especiales (10 platos)
+            { id: 36, name: "Chirashi Bowl", description: "Bowl de sashimi variado sobre arroz", category: "especiales" },
+            { id: 37, name: "Poke de Salmón", description: "Salmón marinado estilo hawaiano", category: "especiales" },
+            { id: 38, name: "Tataki de Atún", description: "Atún sellado con semillas de sésamo", category: "especiales" },
+            { id: 39, name: "Carpaccio de Salmón", description: "Salmón en láminas con salsa ponzu", category: "especiales" },
+            { id: 40, name: "Gyoza de Gambas", description: "Empanadillas japonesas de gambas", category: "especiales" },
+            { id: 41, name: "Tempura de Verduras", description: "Verduras en tempura crujiente", category: "especiales" },
+            { id: 42, name: "Yakitori de Pollo", description: "Brochetas de pollo teriyaki", category: "especiales" },
+            { id: 43, name: "Edamame", description: "Vainas de soja al vapor con sal", category: "especiales" },
+            { id: 44, name: "Agedashi Tofu", description: "Tofu frito con caldo dashi", category: "especiales" },
+            { id: 45, name: "Sunomono", description: "Ensalada de pepino agridulce", category: "especiales" },
+
+            // Postres (5 platos)
+            { id: 46, name: "Mochi de Té Verde", description: "Postre tradicional japonés", category: "postres" },
+            { id: 47, name: "Dorayaki", description: "Pancakes rellenos de crema dulce", category: "postres" },
+            { id: 48, name: "Helado de Sésamo Negro", description: "Helado cremoso oriental", category: "postres" },
+            { id: 49, name: "Daifuku", description: "Mochi relleno de pasta de judía", category: "postres" },
+            { id: 50, name: "Castella", description: "Bizcocho esponjoso japonés", category: "postres" }
+        ];
+
+        // Sistema de almacenamiento local
+        const Storage = {
+            save: (key, data) => {
+                localStorage.setItem(`buffetsushi_${MESA_CODE}_${key}`, JSON.stringify(data));
+            },
+            
+            load: (key) => {
+                const data = localStorage.getItem(`buffetsushi_${MESA_CODE}_${key}`);
+                return data ? JSON.parse(data) : null;
+            },
+            
+            clear: (key) => {
+                localStorage.removeItem(`buffetsushi_${MESA_CODE}_${key}`);
+            }
+        };
+
+        // Utilidades
+        const Utils = {
+            showView: (viewId) => {
+                document.querySelectorAll('.view').forEach(view => {
+                    view.classList.remove('active');
+                });
+                document.getElementById(viewId).classList.add('active');
+            },
+            
+            showModal: (modalId) => {
+                document.getElementById(modalId).classList.add('active');
+            },
+            
+            hideModal: (modalId) => {
+                document.getElementById(modalId).classList.remove('active');
+            },
+            
+            formatTime: (date) => {
+                return date.toLocaleTimeString('es-ES', {
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+            },
+            
+            generateOrderId: () => {
+                return `ORD-${MESA_NUMBER}-${currentOrderNumber++}-${Date.now()}`;
+            }
+        };
+
+        // Gestión de mesa
+        const MesaManager = {
+            init: () => {
+                console.log('🚀 Iniciando MesaManager para Mesa', MESA_NUMBER);
+                
+                // Cargar TODOS los datos guardados
+                const savedPersonas = Storage.load('personas');
+                const isActive = Storage.load('active');
+                const mesaActivated = Storage.load('mesaActivated');
+                const savedPlatosLimit = Storage.load('platosLimit');
+                const activationTimestamp = Storage.load('activationTimestamp');
+                
+                console.log('📊 Estado completo guardado:', {
+                    savedPersonas,
+                    isActive,
+                    mesaActivated,
+                    savedPlatosLimit,
+                    activationTimestamp
+                });
+                
+                // Verificar si la mesa está realmente activa
+                if (savedPersonas && isActive && mesaActivated) {
+                    console.log('✅ Mesa ACTIVA encontrada - Restaurando estado completo');
+                    
+                    // Restaurar TODA la configuración
+                    currentPersonas = savedPersonas;
+                    platosLimit = savedPlatosLimit || (currentPersonas * 5);
+                    
+                    // Cargar historial COMPLETO
+                    MesaManager.loadOrderHistory();
+                    
+                    // Inicializar MenuManager para cargar el carrito
+                    MenuManager.init();
+                    console.log('🛍️ MenuManager inicializado con carrito');
+                    
+                    // Actualizar toda la UI
+                    MesaManager.updateUI();
+                    MenuManager.updateUI();
+                    
+                    // Ir directamente al menú
+                    Utils.showView('menu-view');
+                    MenuManager.render();
+                    
+                    console.log('🔄 Mesa', MESA_NUMBER, 'COMPLETAMENTE RESTAURADA:');
+                    console.log('  - Personas:', currentPersonas);
+                    console.log('  - Límite platos:', platosLimit);
+                    console.log('  - Historial:', orderHistory.length, 'pedidos');
+                    console.log('  - Carrito:', currentCart.length, 'items');
+                    console.log('  - Activada el:', activationTimestamp);
+                } else {
+                    console.log('🆕 Mesa NO ACTIVA - Mostrar configuración inicial');
+                    MesaManager.initPersonCounter();
+                    Utils.showView('mesa-config-view');
+                }
+            },
+            
+            initPersonCounter: () => {
+                currentPersonasCount = 1;
+                const counter = document.getElementById('personas-counter'); if (counter) counter.textContent = currentPersonasCount;
+                MesaManager.updateCounterButtons();
+            },
+            
+            increasePersonas: () => {
+                console.log('📈 increasePersonas called, current:', currentPersonasCount);
+                if (currentPersonasCount < 8) {
+                    currentPersonasCount++;
+                    console.log('📈 Increased to:', currentPersonasCount);
+                    const counter = document.getElementById('personas-counter');
+                    if (counter) {
+                        counter.textContent = currentPersonasCount;
+                        console.log('📈 Updated counter display');
+                    }
+                    MesaManager.updateCounterButtons();
+                } else {
+                    console.log('📈 Already at max (8)');
+                }
+            },
+            
+            decreasePersonas: () => {
+                console.log('📉 decreasePersonas called, current:', currentPersonasCount);
+                if (currentPersonasCount > 1) {
+                    currentPersonasCount--;
+                    console.log('📉 Decreased to:', currentPersonasCount);
+                    const counter = document.getElementById('personas-counter');
+                    if (counter) {
+                        counter.textContent = currentPersonasCount;
+                        console.log('📉 Updated counter display');
+                    }
+                    MesaManager.updateCounterButtons();
+                } else {
+                    console.log('📉 Already at min (1)');
+                }
+            },
+            
+            updateCounterButtons: () => {
+                const decreaseBtn = document.getElementById('decrease-personas');
+                const increaseBtn = document.getElementById('increase-personas');
+                
+                if (decreaseBtn) decreaseBtn.disabled = currentPersonasCount <= 1;
+                if (increaseBtn) increaseBtn.disabled = currentPersonasCount >= 8;
+            },
+            
+            confirmPersonas: () => {
+                console.log('✅ confirmPersonas called with:', currentPersonasCount);
+                currentPersonas = currentPersonasCount;
+                platosLimit = currentPersonas * 5;
+                console.log('✅ Set personas:', currentPersonas, 'limit:', platosLimit);
+                
+                Storage.save('personas', currentPersonas);
+                Storage.save('active', true);
+                console.log('✅ Saved to storage');
+                
+                MesaManager.loadOrderHistory();
+                MesaManager.updateUI();
+                console.log('✅ Switching to menu view');
+                Utils.showView('menu-view');
+                MenuManager.init();
+                console.log('✅ Menu initialized');
+            },
+            
+            updateUI: () => {
+                const personasCountEl = document.getElementById('personas-count');
+                const platosLimitEl = document.getElementById('platos-limit');
+                
+                if (personasCountEl) personasCountEl.textContent = currentPersonas;
+                if (platosLimitEl) platosLimitEl.textContent = platosLimit;
+            },
+            
+            loadOrderHistory: () => {
+                console.log('📈 Cargando historial de pedidos...');
+                orderHistory = Storage.load('history') || [];
+                console.log('📈 Historial cargado:', orderHistory.length, 'pedidos');
+                
+                const lastOrder = orderHistory[orderHistory.length - 1];
+                if (lastOrder) {
+                    const orderParts = lastOrder.id.split('-');
+                    currentOrderNumber = parseInt(orderParts[2]) + 1;
+                    console.log('🔢 Último pedido:', lastOrder.id, '- Próximo número:', currentOrderNumber);
+                } else {
+                    currentOrderNumber = 1;
+                    console.log('🔢 Sin historial previo - Comenzando con pedido #1');
+                }
+                
+                // Renderizar historial inmediatamente
+                HistoryManager.render();
+                
+                console.log('✅ Historial cargado correctamente');
+            }
+        };
+
+        // Gestión del menú
+        const MenuManager = {
+            currentCategory: 'all',
+            
+            init: () => {
+                MenuManager.render();
+                MenuManager.loadCart();
+            },
+            
+            render: () => {
+                console.log('🍽️ MenuManager.render called');
+                const container = document.getElementById('menu-items');
+                console.log('🍽️ Container found:', !!container);
+                container.innerHTML = '';
+                
+                const filteredItems = MenuManager.currentCategory === 'all' 
+                    ? menuDatabase 
+                    : menuDatabase.filter(item => item.category === MenuManager.currentCategory);
+                console.log('🍽️ Filtered items count:', filteredItems.length);
+                console.log('🍽️ Current category:', MenuManager.currentCategory);
+                
+                filteredItems.forEach(item => {
+                    const cartItem = currentCart.find(ci => ci.id === item.id);
+                    const quantity = cartItem ? cartItem.quantity : 0;
+                    
+                    const itemElement = document.createElement('div');
+                    itemElement.className = `menu-item ${quantity > 0 ? 'selected' : ''}`;
+                    itemElement.innerHTML = `
+                        <div class="menu-item-header">
+                            <div>
+                                <h3>${item.name}</h3>
+                            </div>
+                            <span class="menu-item-category">${item.category}</span>
+                        </div>
+                        <p>${item.description}</p>
+                        <div class="menu-item-footer">
+                            ${quantity === 0 ? `
+                                <button class="add-btn" onclick="MenuManager.addToCart(${item.id})" ${MenuManager.getTotalCartItems() >= platosLimit ? 'disabled' : ''}>
+                                    <i class="fas fa-plus"></i> Añadir
+                                </button>
+                            ` : `
+                                <div class="quantity-controls">
+                                    <button class="quantity-btn" onclick="MenuManager.decreaseQuantity(${item.id})">-</button>
+                                    <span class="quantity">${quantity}</span>
+                                    <button class="quantity-btn" onclick="MenuManager.increaseQuantity(${item.id})" ${MenuManager.getTotalCartItems() >= platosLimit ? 'disabled' : ''}>+</button>
+                                </div>
+                            `}
+                        </div>
+                    `;
+                    container.appendChild(itemElement);
+                });
+            },
+            
+            filterByCategory: (category) => {
+                MenuManager.currentCategory = category;
+                
+                // Resetear todos los botones
+                document.querySelectorAll('.tab-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                
+                // Buscar el botón correspondiente de forma segura
+                const targetBtn = document.querySelector(`[data-category="${category}"]`) || 
+                                 Array.from(document.querySelectorAll('.tab-btn')).find(btn => {
+                                     const text = btn.textContent.toLowerCase();
+                                     return (category === 'all' && text === 'todos') ||
+                                            (category === 'nigiri' && text === 'nigiri') ||
+                                            (category === 'maki' && text === 'maki') ||
+                                            (category === 'sashimi' && text === 'sashimi') ||
+                                            (category === 'especiales' && text === 'especiales') ||
+                                            (category === 'postres' && text === 'postres');
+                                 });
+                
+                if (targetBtn) {
+                    targetBtn.classList.add('active');
+                } else {
+                    console.warn('No se encontró botón para categoría:', category);
+                    // Activar "Todos" por defecto
+                    const todosBtn = document.querySelectorAll('.tab-btn')[0];
+                    if (todosBtn) todosBtn.classList.add('active');
+                }
+                
+                MenuManager.render();
+            },
+            
+            addToCart: (itemId) => {
+                if (MenuManager.getTotalCartItems() >= platosLimit) return;
+                
+                const item = menuDatabase.find(i => i.id === itemId);
+                const existingItem = currentCart.find(ci => ci.id === itemId);
+                
+                if (existingItem) {
+                    existingItem.quantity++;
+                } else {
+                    currentCart.push({
+                        ...item,
+                        quantity: 1,
+                        timestamp: new Date().toISOString()
+                    });
+                }
+                
+                MenuManager.saveCart();
+                MesaManager.updateUI();
+                MenuManager.render();
+            },
+            
+            increaseQuantity: (itemId) => {
+                if (MenuManager.getTotalCartItems() >= platosLimit) return;
+                
+                const existingItem = currentCart.find(ci => ci.id === itemId);
+                if (existingItem) {
+                    existingItem.quantity++;
+                    MenuManager.saveCart();
+                    MesaManager.updateUI();
+                    MenuManager.render();
+                }
+            },
+            
+            decreaseQuantity: (itemId) => {
+                const existingItem = currentCart.find(ci => ci.id === itemId);
+                if (existingItem) {
+                    existingItem.quantity--;
+                    if (existingItem.quantity <= 0) {
+                        currentCart = currentCart.filter(ci => ci.id !== itemId);
+                    }
+                    MenuManager.saveCart();
+                    MesaManager.updateUI();
+                    MenuManager.render();
+                }
+            },
+            
+            removeFromCart: (itemId) => {
+                currentCart = currentCart.filter(ci => ci.id !== itemId);
+                MenuManager.saveCart();
+                MesaManager.updateUI();
+                MenuManager.render();
+                CartManager.render();
+            },
+            
+            getTotalCartItems: () => {
+                return currentCart.reduce((total, item) => total + item.quantity, 0);
+            },
+            
+            updateUI: () => {
+                const totalItems = MenuManager.getTotalCartItems();
+                const platosSelectedEl = document.getElementById('platos-selected'); if (platosSelectedEl) platosSelectedEl.textContent = totalItems;
+                const cartCountEl = document.getElementById('cart-count'); if (cartCountEl) cartCountEl.textContent = totalItems;
+                
+                const makeOrderBtn = document.getElementById('make-order-btn');
+                if (makeOrderBtn) makeOrderBtn.disabled = totalItems === 0;
+                
+                const counter = document.getElementById('platos-selected');
+                if (counter) counter.style.color = totalItems >= platosLimit ? '#F44336' : '#D4AF37';
+            },
+            
+            loadCart: () => {
+                currentCart = Storage.load('cart') || [];
+                MesaManager.updateUI();
+            },
+            
+            saveCart: () => {
+                Storage.save('cart', currentCart);
+            },
+            
+            clearCart: () => {
+                currentCart = [];
+                MenuManager.saveCart();
+                MesaManager.updateUI();
+                MenuManager.render();
+                CartManager.render();
+            }
+        };
+
+        // Gestión del carrito
+        const CartManager = {
+            render: () => {
+                const container = document.getElementById('cart-items');
+                container.innerHTML = '';
+                
+                if (currentCart.length === 0) {
+                    container.innerHTML = `
+                        <div style="text-align: center; padding: 40px; color: #999;">
+                            <i class="fas fa-shopping-cart" style="font-size: 3rem; margin-bottom: 20px;"></i>
+                            <p>Tu carrito está vacío</p>
+                        </div>
+                    `;
+                } else {
+                    currentCart.forEach(item => {
+                        const itemElement = document.createElement('div');
+                        itemElement.className = 'cart-item';
+                        itemElement.innerHTML = `
+                            <div class="cart-item-info">
+                                <h4>${item.name}</h4>
+                                <p>${item.description}</p>
+                            </div>
+                            <div class="quantity-controls">
+                                <button class="quantity-btn" onclick="MenuManager.decreaseQuantity(${item.id})">-</button>
+                                <span class="quantity">${item.quantity}</span>
+                                <button class="quantity-btn" onclick="MenuManager.increaseQuantity(${item.id})" ${MenuManager.getTotalCartItems() >= platosLimit ? 'disabled' : ''}>+</button>
+                                <button class="btn-secondary" onclick="MenuManager.removeFromCart(${item.id})" style="margin-left: 15px; padding: 5px 10px;">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        `;
+                        container.appendChild(itemElement);
+                    });
+                }
+                
+                document.getElementById('total-plates').textContent = MenuManager.getTotalCartItems();
+            }
+        };
+
+        // Gestión de pedidos
+        const OrderManager = {
+            makeOrder: async () => {
+                if (currentCart.length === 0) return;
+                
+                Utils.showModal('loading-modal');
+                
+                await new Promise(resolve => setTimeout(resolve, 2000));
+                
+                const order = {
+                    id: Utils.generateOrderId(),
+                    mesa: MESA_NUMBER,
+                    items: [...currentCart],
+                    timestamp: new Date().toISOString(),
+                    status: 'pending',
+                    totalItems: MenuManager.getTotalCartItems()
+                };
+                
+                orderHistory.push(order);
+                Storage.save('history', orderHistory);
+                
+                // Guardar para admin
+                const allOrders = JSON.parse(localStorage.getItem('buffetsushi_allOrders')) || [];
+                allOrders.push(order);
+                localStorage.setItem('buffetsushi_allOrders', JSON.stringify(allOrders));
+                
+                MenuManager.clearCart();
+                
+                Utils.hideModal('loading-modal');
+                Utils.showView('history-view');
+                HistoryManager.render();
+            }
+        };
+
+        // Gestión del historial
+        const HistoryManager = {
+            render: () => {
+                console.log('📜 Renderizando historial:', orderHistory.length, 'pedidos');
+                const container = document.getElementById('order-history');
+                
+                if (!container) {
+                    console.warn('⚠️ Contenedor del historial no encontrado');
+                    return;
+                }
+                
+                container.innerHTML = '';
+                
+                if (orderHistory.length === 0) {
+                    container.innerHTML = `
+                        <div style="text-align: center; padding: 40px; color: #999;">
+                            <i class="fas fa-receipt" style="font-size: 3rem; margin-bottom: 20px;"></i>
+                            <p>No hay pedidos realizados aún</p>
+                        </div>
+                    `;
+                } else {
+                    const sortedHistory = [...orderHistory].reverse();
+                    
+                    sortedHistory.forEach((order, index) => {
+                        const orderElement = document.createElement('div');
+                        orderElement.className = 'order-card';
+                        orderElement.innerHTML = `
+                            <div class="order-header">
+                                <div class="order-number">Pedido #${orderHistory.length - index}</div>
+                                <div class="order-time">${Utils.formatTime(new Date(order.timestamp))}</div>
+                                <div class="order-status ${order.status}">${order.status === 'pending' ? 'Pendiente' : 'Completado'}</div>
+                            </div>
+                            <div class="order-items">
+                                ${order.items.map(item => `
+                                    <div class="order-item">
+                                        <span class="order-item-name">${item.name}</span>
+                                        <span class="order-item-quantity">x${item.quantity}</span>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        `;
+                        container.appendChild(orderElement);
+                        
+                        if (index < sortedHistory.length - 1) {
+                            const separator = document.createElement('div');
+                            separator.style.cssText = `
+                                height: 2px;
+                                background: linear-gradient(90deg, transparent, #D4AF37, transparent);
+                                margin: 20px 0;
+                            `;
+                            container.appendChild(separator);
+                        }
+                    });
+                }
+            }
+        };
+
+        // Event Listeners
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('🚀 DOM cargado - Iniciando BuffetSushi Mesa', MESA_NUMBER);
+            console.log('🔧 Probando localStorage antes de inicializar...');
+            
+            // Probar localStorage
+            if (testLocalStorage()) {
+                console.log('✅ localStorage OK - Procediendo con inicialización');
+                
+                // Asegurar que el DOM esté completamente listo
+                setTimeout(() => {
+                    console.log('🚀 Iniciando MesaManager después de timeout...');
+                    MesaManager.init();
+                }, 200);
+            } else {
+                console.error('❌ localStorage no funciona - No se puede inicializar');
+                alert('Error: No se puede acceder al almacenamiento local. Por favor, actualice la página.');
+            }
+            
+            // Contadores de personas - Verificar que existen los elementos
+            const decreaseBtn = document.getElementById('decrease-personas');
+            const increaseBtn = document.getElementById('increase-personas');
+            const confirmBtn = document.getElementById('confirm-personas-btn');
+            
+            console.log('Elementos encontrados:', {
+                decreaseBtn: !!decreaseBtn,
+                increaseBtn: !!increaseBtn,
+                confirmBtn: !!confirmBtn
+            });
+            
+            if (decreaseBtn) {
+                decreaseBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    console.log('🔽 Decrease clicked');
+                    MesaManager.decreasePersonas();
+                });
+            }
+            
+            if (increaseBtn) {
+                increaseBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    console.log('🔼 Increase clicked');
+                    MesaManager.increasePersonas();
+                });
+            }
+            
+            if (confirmBtn) {
+                confirmBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    console.log('✅ Confirm clicked');
+                    MesaManager.confirmPersonas();
+                });
+            }
+            
+            // Tabs del menú
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const category = e.target.dataset.category || 
+                                   e.target.textContent.toLowerCase() === 'todos' ? 'all' :
+                                   e.target.textContent.toLowerCase();
+                    
+                    console.log('🔘 Tab clicked:', category);
+                    
+                    // Usar la función global en lugar de MenuManager para evitar conflictos
+                    filterByCategory(category);
+                });
+            });
+            
+            // Navegación - Con verificación de existencia de elementos
+            const viewCartBtn = document.getElementById('view-cart-btn');
+            if (viewCartBtn) {
+                viewCartBtn.addEventListener('click', () => {
+                    CartManager.render();
+                    Utils.showView('cart-view');
+                });
+            }
+            
+            const backToMenuBtn = document.getElementById('back-to-menu-btn');
+            if (backToMenuBtn) {
+                backToMenuBtn.addEventListener('click', () => {
+                    Utils.showView('menu-view');
+                });
+            }
+            
+            const makeOrderBtn = document.getElementById('make-order-btn');
+            if (makeOrderBtn) {
+                makeOrderBtn.addEventListener('click', () => {
+                    CartManager.render();
+                    Utils.showView('cart-view');
+                });
+            }
+            
+            const confirmOrderBtn = document.getElementById('confirm-order-btn');
+            if (confirmOrderBtn) {
+                confirmOrderBtn.addEventListener('click', () => {
+                    OrderManager.makeOrder();
+                });
+            }
+            
+            const clearCartBtn = document.getElementById('clear-cart-btn');
+            if (clearCartBtn) {
+                clearCartBtn.addEventListener('click', () => {
+                    if (confirm('¿Estás seguro de que quieres limpiar el carrito?')) {
+                        MenuManager.clearCart();
+                    }
+                });
+            }
+            
+            const newOrderBtn = document.getElementById('new-order-btn');
+            if (newOrderBtn) {
+                newOrderBtn.addEventListener('click', () => {
+                    Utils.showView('menu-view');
+                });
+            }
+        });
+
+        // Hacer funciones globales
+        window.MenuManager = MenuManager;
+        window.MesaManager = MesaManager;
+        window.CartManager = CartManager;
+        window.OrderManager = OrderManager;
+        
+        // Funciones globales para los botones del contador
+        window.increasePersonas = () => {
+            console.log('🔼 Global increasePersonas called');
+            if (currentPersonasCount < 8) {
+                currentPersonasCount++;
+                const counter = document.getElementById('personas-counter'); if (counter) counter.textContent = currentPersonasCount;
+                console.log('🔼 Updated to:', currentPersonasCount);
+            }
+        };
+        
+        window.decreasePersonas = () => {
+            console.log('🔽 Global decreasePersonas called');
+            if (currentPersonasCount > 1) {
+                currentPersonasCount--;
+                const counter = document.getElementById('personas-counter'); if (counter) counter.textContent = currentPersonasCount;
+                console.log('🔽 Updated to:', currentPersonasCount);
+            }
+        };
+        
+        window.confirmPersonas = () => {
+            console.log('✅ INICIANDO CONFIRMACION DE PERSONAS');
+            console.log('📄 Current count:', currentPersonasCount);
+            
+            try {
+                // Configurar personas directamente
+                currentPersonas = currentPersonasCount;
+                platosLimit = currentPersonas * 5;
+                console.log('✅ Variables configuradas - personas:', currentPersonas, 'limit:', platosLimit);
+                
+                // GUARDAR TODO EN localStorage DE FORMA SECUENCIAL
+                console.log('💾 Iniciando guardado en localStorage...');
+                
+                Storage.save('personas', currentPersonas);
+                console.log('💾 ✅ Guardado personas:', currentPersonas);
+                
+                Storage.save('active', true);
+                console.log('💾 ✅ Guardado active: true');
+                
+                Storage.save('platosLimit', platosLimit);
+                console.log('💾 ✅ Guardado platosLimit:', platosLimit);
+                
+                Storage.save('mesaActivated', true);
+                console.log('💾 ✅ Guardado mesaActivated: true');
+                
+                const timestamp = new Date().toISOString();
+                Storage.save('activationTimestamp', timestamp);
+                console.log('💾 ✅ Guardado activationTimestamp:', timestamp);
+                
+                // Inicializar arrays vacíos
+                Storage.save('history', []);
+                orderHistory = [];
+                console.log('💾 ✅ Guardado history: []');
+                
+                Storage.save('cart', []);
+                currentCart = [];
+                console.log('💾 ✅ Guardado cart: []');
+                
+                // VERIFICAR QUE TODO SE GUARDÓ CORRECTAMENTE
+                console.log('🔍 Verificando datos guardados...');
+                const verification = {
+                    personas: Storage.load('personas'),
+                    active: Storage.load('active'),
+                    platosLimit: Storage.load('platosLimit'),
+                    mesaActivated: Storage.load('mesaActivated'),
+                    activationTimestamp: Storage.load('activationTimestamp'),
+                    history: Storage.load('history'),
+                    cart: Storage.load('cart')
+                };
+                
+                console.log('🔍 Verificación completa:', verification);
+                
+                // Comprobar que la condición de activación se cumple
+                const wouldBeActive = verification.personas && verification.active && verification.mesaActivated;
+                console.log('🔍 ¿Sería detectada como activa?', wouldBeActive);
+                
+                if (!wouldBeActive) {
+                    console.error('❌ ERROR: La mesa NO sería detectada como activa al recargar');
+                    console.error('personas:', verification.personas, 'active:', verification.active, 'mesaActivated:', verification.mesaActivated);
+                } else {
+                    console.log('✅ EXITO: La mesa SERÍA detectada como activa al recargar');
+                }
+                
+                // Actualizar UI
+                const personasCountEl = document.getElementById('personas-count'); if (personasCountEl) personasCountEl.textContent = currentPersonas;
+                const platosLimitEl = document.getElementById('platos-limit'); if (platosLimitEl) platosLimitEl.textContent = platosLimit;
+                
+                // Ir al menú
+                console.log('✅ Cambiando a vista de menú...');
+                Utils.showView('menu-view');
+                
+                // Renderizar menú y actualizar UI
+                renderMenuItems('all');
+                updateCartUI();
+                
+                console.log('✅ Mesa', MESA_NUMBER, 'COMPLETAMENTE ACTIVADA Y CONFIGURADA');
+                
+                // Test final - simular recarga
+                setTimeout(() => {
+                    console.log('🧪 SIMULANDO RECARGA - ¿Qué pasaría al recargar?');
+                    const testPersonas = Storage.load('personas');
+                    const testActive = Storage.load('active');
+                    const testMesaActivated = Storage.load('mesaActivated');
+                    const testCondition = testPersonas && testActive && testMesaActivated;
+                    console.log('Datos que cargaría:', {
+                        personas: testPersonas,
+                        active: testActive, 
+                        mesaActivated: testMesaActivated,
+                        condition: testCondition
+                    });
+                    console.log(testCondition ? '✅ EXITOSO: Iría al menú' : '❌ ERROR: Mostraría configuración');
+                }, 1000);
+                
+            } catch (error) {
+                console.error('❌ ERROR CRITICO en confirmPersonas:', error);
+            }
+        };
+        
+        // Función global para renderizar platos
+        window.renderMenuItems = (category = 'all') => {
+            console.log('🍽️ Rendering menu items, category:', category);
+            const container = document.getElementById('menu-items');
+            if (!container) {
+                console.error('Menu container not found!');
+                return;
+            }
+            
+            container.innerHTML = '';
+            
+            const filteredItems = category === 'all' 
+                ? menuDatabase 
+                : menuDatabase.filter(item => item.category === category);
+            
+            console.log('🍽️ Filtered items:', filteredItems.length);
+            
+            filteredItems.forEach(item => {
+                const cartItem = currentCart.find(ci => ci.id === item.id);
+                const quantity = cartItem ? cartItem.quantity : 0;
+                
+                const itemElement = document.createElement('div');
+                itemElement.className = `menu-item ${quantity > 0 ? 'selected' : ''}`;
+                itemElement.innerHTML = `
+                    <div class="menu-item-header">
+                        <div>
+                            <h3>${item.name}</h3>
+                        </div>
+                        <span class="menu-item-category">${item.category}</span>
+                    </div>
+                    <p>${item.description}</p>
+                    <div class="menu-item-footer">
+                        ${quantity === 0 ? `
+                            <button class="add-btn" onclick="addToCart(${item.id})">
+                                <i class="fas fa-plus"></i> Añadir
+                            </button>
+                        ` : `
+                            <div class="quantity-controls">
+                                <button class="quantity-btn" onclick="decreaseQuantity(${item.id})">-</button>
+                                <span class="quantity">${quantity}</span>
+                                <button class="quantity-btn" onclick="increaseQuantity(${item.id})">+</button>
+                            </div>
+                        `}
+                    </div>
+                `;
+                container.appendChild(itemElement);
+            });
+            
+            console.log('🍽️ Menu rendered with', filteredItems.length, 'items');
+        };
+        
+        // Función global para filtrar categorías
+        window.filterByCategory = (category) => {
+            console.log('📂 Filtering by category:', category);
+            
+            try {
+                // Guardar categoría actual
+                currentMenuCategory = category;
+                
+                // Resetear todos los botones
+                document.querySelectorAll('.tab-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                
+                // Activar el botón correspondiente de forma segura
+                if (event && event.target) {
+                    event.target.classList.add('active');
+                } else {
+                    // Buscar el botón por texto si no hay event.target
+                    const targetBtn = Array.from(document.querySelectorAll('.tab-btn')).find(btn => {
+                        const text = btn.textContent.toLowerCase();
+                        return (category === 'all' && text === 'todos') ||
+                               (category === 'nigiri' && text === 'nigiri') ||
+                               (category === 'maki' && text === 'maki') ||
+                               (category === 'sashimi' && text === 'sashimi') ||
+                               (category === 'especiales' && text === 'especiales') ||
+                               (category === 'postres' && text === 'postres');
+                    });
+                    
+                    if (targetBtn) {
+                        targetBtn.classList.add('active');
+                    } else {
+                        // Activar "Todos" por defecto
+                        const todosBtn = document.querySelectorAll('.tab-btn')[0];
+                        if (todosBtn) todosBtn.classList.add('active');
+                    }
+                }
+                
+                // Renderizar con nueva categoría
+                renderMenuItems(category);
+                
+            } catch (error) {
+                console.error('❌ Error en filterByCategory:', error);
+                // En caso de error, mostrar todos los productos
+                renderMenuItems('all');
+            }
+        };
+        
+        // Funciones globales para el carrito
+        // Variable para mantener categoría actual
+        let currentMenuCategory = 'all';
+        
+        window.addToCart = (itemId) => {
+            console.log('🛍️ Adding to cart:', itemId);
+            const item = menuDatabase.find(i => i.id === itemId);
+            if (!item) return;
+            
+            const existingItem = currentCart.find(ci => ci.id === itemId);
+            if (existingItem) {
+                existingItem.quantity++;
+            } else {
+                currentCart.push({
+                    ...item,
+                    quantity: 1,
+                    timestamp: new Date().toISOString()
+                });
+            }
+            
+            // Guardar carrito
+            Storage.save('cart', currentCart);
+            
+            // Actualizar UI manteniendo categoría
+            updateCartUI();
+            renderMenuItems(currentMenuCategory);
+        };
+        
+        window.increaseQuantity = (itemId) => {
+            const existingItem = currentCart.find(ci => ci.id === itemId);
+            if (existingItem && currentCart.reduce((total, item) => total + item.quantity, 0) < platosLimit) {
+                existingItem.quantity++;
+                Storage.save('cart', currentCart);
+                updateCartUI();
+                renderMenuItems(currentMenuCategory); // Mantener categoría
+            }
+        };
+        
+        window.decreaseQuantity = (itemId) => {
+            const existingItem = currentCart.find(ci => ci.id === itemId);
+            if (existingItem) {
+                existingItem.quantity--;
+                if (existingItem.quantity <= 0) {
+                    currentCart = currentCart.filter(ci => ci.id !== itemId);
+                }
+                Storage.save('cart', currentCart);
+                updateCartUI();
+                renderMenuItems(currentMenuCategory); // Mantener categoría
+            }
+        };
+        
+        window.updateCartUI = () => {
+            const totalItems = currentCart.reduce((total, item) => total + item.quantity, 0);
+            const platosSelectedEl = document.getElementById('platos-selected');
+            const cartCountEl = document.getElementById('cart-count');
+            
+            if (platosSelectedEl) platosSelectedEl.textContent = totalItems;
+            if (cartCountEl) cartCountEl.textContent = totalItems;
+            
+            const makeOrderBtn = document.getElementById('make-order-btn');
+            if (makeOrderBtn) if (makeOrderBtn) makeOrderBtn.disabled = totalItems === 0;
+        };
+        
+        // Funciones de navegación
+        window.viewCart = () => {
+            console.log('🛍️ Going to cart view');
+            renderCartItems();
+            Utils.showView('cart-view');
+        };
+        
+        window.backToMenu = () => {
+            console.log('🍽️ Going back to menu');
+            Utils.showView('menu-view');
+        };
+        
+        window.makeOrder = () => {
+            console.log('ðŸ“¦ Making order');
+            renderCartItems();
+            Utils.showView('cart-view');
+        };
+        
+        // Nueva funciÃ³n unificada para "Ver Pedido"
+        window.viewOrder = async () => {
+            console.log('ðŸ“‹ Ver Pedido - Procesando automÃ¡ticamente');
+            
+            // Mostrar vista del carrito primero
+            renderCartItems();
+            Utils.showView('cart-view');
+            
+            // Si hay items en el carrito, procesarlos automÃ¡ticamente
+            if (currentCart.length > 0) {
+                // Mostrar modal de procesamiento
+                Utils.showModal('loading-modal');
+                
+                // Esperar un momento para mostrar el procesamiento
+                await new Promise(resolve => setTimeout(resolve, 2000));
+                
+                // Crear el pedido
+                const order = {
+                    id: Utils.generateOrderId(),
+                    mesa: MESA_NUMBER,
+                    items: [...currentCart],
+                    timestamp: new Date().toISOString(),
+                    status: 'pending',
+                    totalItems: currentCart.reduce((total, item) => total + item.quantity, 0)
+                };
+                
+                // Agregar al historial
+                orderHistory.push(order);
+                
+                // Guardar historial en localStorage
+                Storage.save('history', orderHistory);
+                console.log('ðŸ’¾ Historial actualizado:', orderHistory.length, 'pedidos');
+                
+                // Guardar para admin
+                const allOrders = JSON.parse(localStorage.getItem('buffetsushi_allOrders')) || [];
+                allOrders.push(order);
+                localStorage.setItem('buffetsushi_allOrders', JSON.stringify(allOrders));
+                
+                // Mantener mesa activa
+                Storage.save('personas', currentPersonas);
+                Storage.save('active', true);
+                Storage.save('mesaActivated', true);
+                Storage.save('platosLimit', platosLimit);
+                
+                // Limpiar carrito
+                currentCart = [];
+                Storage.save('cart', currentCart);
+                updateCartUI();
+                
+                // Resetear menÃº
+                currentMenuCategory = 'all';
+                document.querySelectorAll('.tab-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                document.querySelector('.tab-btn').classList.add('active');
+                renderMenuItems('all');
+                
+                console.log('âœ… Pedido procesado automÃ¡ticamente');
+                
+                // Ocultar modal y mostrar carrito actualizado
+                Utils.hideModal('loading-modal');
+            }
+            
+            // Renderizar carrito actualizado (vacÃ­o si habÃ­a items, o mostrar mensaje si estaba vacÃ­o)
+            renderCartItems();
+            
+            // Cargar y mostrar historial actualizado automÃ¡ticamente
+            setTimeout(() => {
+                const historyContainer = document.getElementById('cart-order-history');
+                if (historyContainer) {
+                    // Renderizar historial en la vista del carrito
+                    renderCartHistory();
+                }
+            }, 100);
+        };
+        
+        window.renderCartItems = () => {
+            const container = document.getElementById('cart-items');
+            if (!container) return;
+            
+            container.innerHTML = '';
+            
+            if (currentCart.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 40px; color: #999;">
+                        <i class="fas fa-shopping-cart" style="font-size: 3rem; margin-bottom: 20px;"></i>
+                        <p>Tu carrito está vacío</p>
+                    </div>
+                `;
+            } else {
+                currentCart.forEach(item => {
+                    const itemElement = document.createElement('div');
+                    itemElement.className = 'cart-item';
+                    itemElement.innerHTML = `
+                        <div class="cart-item-info">
+                            <h4>${item.name}</h4>
+                            <p>${item.description}</p>
+                        </div>
+                        <div class="cart-item-controls">
+                            <div class="quantity-controls">
+                                <button class="quantity-btn" onclick="decreaseQuantity(${item.id}); renderCartItems();">-</button>
+                                <span class="quantity">${item.quantity}</span>
+                                <button class="quantity-btn" onclick="increaseQuantity(${item.id}); renderCartItems();">+</button>
+                            </div>
+                            <button class="btn-secondary" onclick="removeFromCart(${item.id})" style="padding: 8px 12px; min-width: 100px;">
+                                <i class="fas fa-trash"></i>
+                                Eliminar
+                            </button>
+                        </div>
+                    `;
+                    container.appendChild(itemElement);
+                });
+            }
+            
+            // Actualizar total
+            const totalPlatesEl = document.getElementById('total-plates');
+            if (totalPlatesEl) {
+                totalPlatesEl.textContent = currentCart.reduce((total, item) => total + item.quantity, 0);
+            }
+        };
+        
+        window.removeFromCart = (itemId) => {
+            currentCart = currentCart.filter(ci => ci.id !== itemId);
+            Storage.save('cart', currentCart);
+            updateCartUI();
+            renderCartItems();
+        };
+        
+        window.clearCart = () => {
+            if (confirm('¿Estás seguro de que quieres limpiar el carrito?')) {
+                currentCart = [];
+                Storage.save('cart', currentCart);
+                updateCartUI();
+                renderCartItems();
+                // Resetear menú también
+                renderMenuItems(currentMenuCategory);
+            }
+        };
+        
+        window.confirmOrder = async () => {
+            if (currentCart.length === 0) return;
+            
+            Utils.showModal('loading-modal');
+            
+            await new Promise(resolve => setTimeout(resolve, 2000));
+            
+            const order = {
+                id: Utils.generateOrderId(),
+                mesa: MESA_NUMBER,
+                items: [...currentCart],
+                timestamp: new Date().toISOString(),
+                status: 'pending',
+                totalItems: currentCart.reduce((total, item) => total + item.quantity, 0)
+            };
+            
+            orderHistory.push(order);
+            
+            // Guardar historial INMEDIATAMENTE en localStorage
+            Storage.save('history', orderHistory);
+            console.log('💾 Historial guardado:', orderHistory.length, 'pedidos');
+            
+            // Guardar para admin
+            const allOrders = JSON.parse(localStorage.getItem('buffetsushi_allOrders')) || [];
+            allOrders.push(order);
+            localStorage.setItem('buffetsushi_allOrders', JSON.stringify(allOrders));
+            
+            // MANTENER mesa activa después del pedido
+            Storage.save('personas', currentPersonas);
+            Storage.save('active', true);
+            Storage.save('mesaActivated', true);
+            Storage.save('platosLimit', platosLimit);
+            console.log('💾 Estado de mesa mantenido activo tras pedido');
+            
+            // Limpiar Pedido completamente
+            currentCart = [];
+            Storage.save('cart', currentCart);
+            updateCartUI();
+            
+            // Resetear menú completamente - esto es CRUCIAL para quitar los selectores
+            currentMenuCategory = 'all'; // Resetear categoría a 'Todos'
+            
+            // Resetear botones de categoría
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelector('.tab-btn').classList.add('active'); // Primer botón (Todos)
+            
+            // Renderizar menú limpio sin selección
+            renderMenuItems('all');
+            
+            console.log('🍽️ Pedido confirmado - Menú reseteado completamente');
+            
+            Utils.hideModal('loading-modal');
+            Utils.showView('history-view');
+            renderOrderHistory();
+        };
+        
+        window.newOrder = () => {
+            // Resetear menú al hacer nuevo pedido - completamente limpio
+            currentMenuCategory = 'all';
+            
+            // Resetear botones de categoría
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelector('.tab-btn').classList.add('active');
+            
+            // Renderizar menú limpio
+            renderMenuItems('all');
+            updateCartUI();
+            Utils.showView('menu-view');
+            
+            console.log('🎆 Nuevo pedido - Menú reseteado completamente');
+        };
+        
+        // Función de debug para verificar estado
+        window.debugMesaState = () => {
+            console.log('🔍 Estado actual de la mesa:');
+            console.log('  - Mesa número:', MESA_NUMBER);
+            console.log('  - Código mesa:', MESA_CODE);
+            console.log('  - Personas:', currentPersonas);
+            console.log('  - Límite platos:', platosLimit);
+            console.log('  - Carrito:', currentCart.length, 'items');
+            console.log('  - Historial:', orderHistory.length, 'pedidos');
+            console.log('  - Storage personas:', Storage.load('personas'));
+            console.log('  - Storage active:', Storage.load('active'));
+            console.log('  - Storage mesaActivated:', Storage.load('mesaActivated'));
+            console.log('  - Storage platosLimit:', Storage.load('platosLimit'));
+            console.log('  - Storage history:', Storage.load('history'));
+            console.log('  - Storage cart:', Storage.load('cart'));
+            console.log('  - Storage activationTimestamp:', Storage.load('activationTimestamp'));
+        };
+        
+        // Función para probar localStorage
+        window.testLocalStorage = () => {
+            console.log('🧪 Probando localStorage...');
+            
+            // Probar escritura y lectura
+            const testKey = `buffetsushi_${MESA_CODE}_test`;
+            const testValue = { test: true, timestamp: new Date().toISOString() };
+            
+            try {
+                localStorage.setItem(testKey, JSON.stringify(testValue));
+                const retrieved = localStorage.getItem(testKey);
+                const parsed = JSON.parse(retrieved);
+                
+                console.log('✅ localStorage funciona correctamente');
+                console.log('  - Guardado:', testValue);
+                console.log('  - Recuperado:', parsed);
+                
+                // Limpiar test
+                localStorage.removeItem(testKey);
+                
+                // Mostrar todas las claves de esta mesa
+                console.log('🔑 Claves existentes para esta mesa:');
+                for (let i = 0; i < localStorage.length; i++) {
+                    const key = localStorage.key(i);
+                    if (key.startsWith(`buffetsushi_${MESA_CODE}_`)) {
+                        const value = localStorage.getItem(key);
+                        console.log(`  - ${key}: ${value}`);
+                    }
+                }
+                
+                return true;
+            } catch (error) {
+                console.error('❌ Error en localStorage:', error);
+                return false;
+            }
+        };
+        
+        // Función para que el admin desactive la mesa (limpiar TODO)
+        window.deactivateMesa = () => {
+            console.log('🗑️ Desactivando mesa', MESA_NUMBER, '- Limpiando TODOS los datos');
+            
+            // Limpiar TODAS las claves de localStorage para esta mesa
+            Storage.clear('personas');
+            Storage.clear('active');
+            Storage.clear('mesaActivated');
+            Storage.clear('platosLimit');
+            Storage.clear('history');
+            Storage.clear('cart');
+            Storage.clear('activationTimestamp');
+            
+            // Resetear variables globales
+            currentPersonas = 0;
+            platosLimit = 5;
+            currentCart = [];
+            orderHistory = [];
+            currentOrderNumber = 1;
+            currentPersonasCount = 1;
+            
+            console.log('🧹 Mesa', MESA_NUMBER, 'completamente desactivada y limpia');
+            
+            // Volver a la configuración inicial
+            Utils.showView('mesa-config-view');
+            MesaManager.initPersonCounter();
+            
+            return 'Mesa desactivada correctamente';
+        };
+        
+        // Función para forzar activación de mesa (para pruebas)
+        window.forceActivateMesa = (personas = 2) => {
+            console.log('💪 Forzando activación de mesa', MESA_NUMBER, 'con', personas, 'personas');
+            
+            // Configurar todas las variables
+            currentPersonas = personas;
+            currentPersonasCount = personas;
+            platosLimit = personas * 5;
+            currentCart = [];
+            orderHistory = [];
+            currentOrderNumber = 1;
+            
+            // Guardar en localStorage
+            Storage.save('personas', personas);
+            Storage.save('active', true);
+            Storage.save('platosLimit', platosLimit);
+            Storage.save('mesaActivated', true);
+            Storage.save('activationTimestamp', new Date().toISOString());
+            Storage.save('history', []);
+            Storage.save('cart', []);
+            
+            console.log('💾 Datos forzados guardados en localStorage');
+            
+            // Actualizar UI
+            if (document.getElementById('personas-count')) {
+                document.getElementById('personas-count').textContent = personas;
+            }
+            if (document.getElementById('platos-limit')) {
+                const platosLimitEl = document.getElementById('platos-limit'); if (platosLimitEl) platosLimitEl.textContent = platosLimit;
+            }
+            
+            // Ir al menú
+            Utils.showView('menu-view');
+            renderMenuItems('all');
+            updateCartUI();
+            
+            console.log('✅ Mesa', MESA_NUMBER, 'FORZADAMENTE ACTIVADA');
+            debugMesaState();
+            
+            return `Mesa ${MESA_NUMBER} activada con ${personas} personas`;
+        };
+        
+        window.renderOrderHistory = () => {
+            const container = document.getElementById('order-history');
+            if (!container) {
+                console.warn('⚠️ No se encontró contenedor de historial');
+                return;
+            }
+            
+            console.log('📄 Renderizando historial con', orderHistory.length, 'pedidos');
+            container.innerHTML = '';
+            
+            if (orderHistory.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 40px; color: #999;">
+                        <i class="fas fa-receipt" style="font-size: 3rem; margin-bottom: 20px;"></i>
+                        <p>No hay pedidos realizados aún</p>
+                    </div>
+                `;
+            } else {
+                const sortedHistory = [...orderHistory].reverse();
+                
+                sortedHistory.forEach((order, index) => {
+                    const orderElement = document.createElement('div');
+                    orderElement.className = 'order-card';
+                    orderElement.innerHTML = `
+                        <div class="order-header">
+                            <div class="order-number">Pedido #${orderHistory.length - index}</div>
+                            <div class="order-time">${Utils.formatTime(new Date(order.timestamp))}</div>
+                            <div class="order-status ${order.status}">${order.status === 'pending' ? 'Pendiente' : 'Completado'}</div>
+                        </div>
+                        <div class="order-items">
+                            ${order.items.map(item => `
+                                <div class="order-item">
+                                    <span class="order-item-name">${item.name}</span>
+                                    <span class="order-item-quantity">x${item.quantity}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `;
+                    container.appendChild(orderElement);
+                    
+                    if (index < sortedHistory.length - 1) {
+                        const separator = document.createElement('div');
+                        separator.style.cssText = `
+                            height: 2px;
+                            background: linear-gradient(90deg, transparent, #D4AF37, transparent);
+                            margin: 20px 0;
+                        `;
+                        container.appendChild(separator);
+                    }
+                });
+            }
+        };
+        
+        // FunciÃ³n para renderizar historial en la vista del carrito
+        window.renderCartHistory = () => {
+            const container = document.getElementById('cart-order-history');
+            if (!container) {
+                console.warn('âš ï¸ No se encontrÃ³ contenedor de historial del carrito');
+                return;
+            }
+            
+            // Cargar historial fresco desde localStorage
+            const savedHistory = Storage.load('history');
+            orderHistory = Array.isArray(savedHistory) ? savedHistory : [];
+            
+            console.log('ðŸ“‹ Renderizando historial en carrito con', orderHistory.length, 'pedidos');
+            container.innerHTML = '';
+            
+            if (orderHistory.length === 0) {
+                container.innerHTML = `
+                    <div class="no-history">
+                        <div class="no-history-icon">
+                            <i class="fas fa-receipt"></i>
+                        </div>
+                        <h4>Sin Historial AÃºn</h4>
+                        <p>No se han realizado pedidos todavÃ­a</p>
+                        <small>Los pedidos que confirmes aparecerÃ¡n aquÃ­ para tu consulta</small>
+                    </div>
+                `;
+            } else {
+                // Mostrar Ãºltimos 5 pedidos
+                const recentOrders = [...orderHistory].reverse().slice(0, 5);
+                
+                recentOrders.forEach((order, index) => {
+                    if (!order || !order.items || !Array.isArray(order.items)) return;
+                    
+                    const orderElement = document.createElement('div');
+                    orderElement.className = 'order-card';
+                    
+                    const orderNumber = orderHistory.length - index;
+                    const orderTime = order.timestamp ? Utils.formatTime(new Date(order.timestamp)) : 'Hora no disponible';
+                    const orderStatus = order.status || 'pending';
+                    
+                    orderElement.innerHTML = `
+                        <div class="order-header">
+                            <div class="order-number">Pedido #${orderNumber}</div>
+                            <div class="order-time">${orderTime}</div>
+                            <div class="order-status ${orderStatus}">
+                                ${orderStatus === 'pending' ? 'Pendiente' : 'Completado'}
+                            </div>
+                        </div>
+                        <div class="order-items">
+                            ${order.items.map(item => {
+                                const itemName = item.name || 'Plato';
+                                const itemQuantity = item.quantity || 1;
+                                return `
+                                    <div class="order-item">
+                                        <span class="order-item-name">${itemName}</span>
+                                        <span class="order-item-quantity">x${itemQuantity}</span>
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
+                    `;
+                    
+                    container.appendChild(orderElement);
+                });
+            }
+        };
+    </script>
+</body>
+</html>
+

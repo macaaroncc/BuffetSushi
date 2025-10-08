@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>BuffetSushi - Panel de Administración (mesas visualizadas)</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root{--bg:#0f1724;--card:#0b1220;--light-card:#111827;--primary-gold:#D4AF37;--secondary-gold:#F1C87E;--text:#E6E6E6;--muted:#9CA3AF;--success:#4CAF50;--danger:#F44336;--inactive:rgba(255,255,255,0.06);}
+    *{box-sizing:border-box;font-family:'Poppins',sans-serif}
+    body{margin:0;background:linear-gradient(180deg,#071027 0%,#08121a 100%);color:var(--text);min-height:100vh}
+    .container{max-width:1100px;margin:32px auto;padding:24px}
+    header{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
+    .logo{font-weight:700;color:var(--primary-gold);font-size:1.4rem}
+    .subtitle{color:var(--muted)}
+    .admin-header{display:flex;justify-content:space-between;align-items:center;gap:20px;margin-bottom:20px}
+    .stats{display:flex;gap:16px;flex-wrap:wrap}
+    .stat-card{background:var(--card);padding:14px 18px;border-radius:10px;border:1px solid rgba(212,175,55,0.12);min-width:140px}
+    .stat-number{font-size:1.6rem;font-weight:700;color:var(--primary-gold);display:block}
+    .stat-label{font-size:0.85rem;color:var(--muted)}
+    .refresh-btn{background:var(--primary-gold);border:none;padding:10px 14px;border-radius:8px;font-weight:700;cursor:pointer;color:#07121a;display:flex;gap:10px;align-items:center}
+    .section{margin-top:18px}
+    h2{margin:8px 0 14px;color:var(--primary-gold)}
+    .mesa-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
+    .mesa-card{background:var(--light-card);padding:14px;border-radius:12px;border:2px solid rgba(212,175,55,0.06)}
+    .mesa-card.active{border-color:var(--primary-gold);box-shadow:0 6px 18px rgba(212,175,55,0.06)}
+    .mesa-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+    .mesa-number{font-weight:700;color:var(--primary-gold)}
+    .mesa-status{font-size:0.85rem;padding:6px 10px;border-radius:999px}
+    .mesa-status.active{background:var(--success);color:#07121a}
+    .mesa-status.inactive{background:var(--inactive);color:var(--muted);border:1px dashed rgba(255,255,255,0.03);padding:6px 8px}
+    .mesa-info{color:var(--muted);font-size:0.92rem;margin-bottom:8px}
+    .mesa-orders{max-height:140px;overflow:auto;margin-bottom:8px}
+    .mini-order{background:rgba(255,255,255,0.02);padding:8px;border-radius:8px;margin-bottom:6px}
+    .btn{padding:8px 12px;border-radius:8px;border:none;cursor:pointer;font-weight:600}
+    .btn-danger{background:var(--danger);color:white}
+    .btn-primary{background:var(--primary-gold);color:#07121a}
+    .btn-ghost{background:transparent;border:1px solid rgba(255,255,255,0.04);color:var(--muted)}
+    .orders-section{margin-top:26px}
+    .orders-header{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px}
+    .filter-controls{display:flex;gap:10px;align-items:center}
+    .filter-select{background:var(--card);border:1px solid rgba(255,255,255,0.03);padding:8px 12px;border-radius:8px;color:var(--text)}
+    .all-orders{display:flex;flex-direction:column;gap:12px}
+    .admin-order-card{background:var(--card);padding:14px;border-radius:12px;border:1px solid rgba(212,175,55,0.04)}
+    .admin-order-header{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:8px}
+    .order-mesa-info{display:flex;gap:12px;align-items:center;color:var(--muted)}
+    .order-time{color:var(--muted);font-size:0.85rem}
+    .empty-state{text-align:center;color:var(--muted);padding:30px}
+    .legend{display:flex;gap:12px;margin-top:16px;font-size:0.9rem}
+    .legend span{display:flex;align-items:center;gap:4px}
+    .legend .active-indicator{width:12px;height:12px;border-radius:50%;background:var(--success)}
+    .legend .inactive-indicator{width:12px;height:12px;border-radius:50%;background:var(--inactive)}
+    @keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+    .spin{animation:spin 1s linear}
+    @media (max-width:520px){.admin-header{flex-direction:column;align-items:flex-start}.orders-header{flex-direction:column;align-items:flex-start}}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div>
+        <div class="logo">BuffetSushi — Admin</div>
+        <div class="subtitle">Panel de Control y Gestión</div>
+      </div>
+      <div class="admin-header">
+        <div class="stats">
+          <div class="stat-card">
+            <span class="stat-number" id="active-tables-count">0</span>
+            <div class="stat-label">Mesas Activas</div>
+          </div>
+          <div class="stat-card">
+            <span class="stat-number" id="pending-orders-count">0</span>
+            <div class="stat-label">Pedidos Pendientes</div>
+          </div>
+          <div class="stat-card">
+            <span class="stat-number" id="total-orders-count">0</span>
+            <div class="stat-label">Pedidos Totales</div>
+          </div>
+        </div>
+        <button class="refresh-btn" id="refresh-btn"><i class="fas fa-sync-alt"></i> Actualizar</button>
+      </div>
+    </header>
+
+    <section class="section">
+      <h2><i class="fas fa-chair"></i> Gestión de Mesas</h2>
+      <div id="mesa-grid" class="mesa-grid"></div>
+      <div class="legend">
+        <span><div class="active-indicator"></div> Ocupada</span>
+        <span><div class="inactive-indicator"></div> Libre</span>
+      </div>
+    </section>
+
+    <section class="orders-section">
+      <div class="orders-header">
+        <h2><i class="fas fa-receipt"></i> Todos los Pedidos</h2>
+        <div class="filter-controls">
+          <select id="mesa-filter" class="filter-select">
+            <option value="all">Todas las mesas</option>
+          </select>
+          <select id="status-filter" class="filter-select">
+            <option value="all">Todos los estados</option>
+            <option value="pending">Pendientes</option>
+            <option value="completed">Completados</option>
+          </select>
+        </div>
+      </div>
+      <div id="all-orders" class="all-orders"></div>
+    </section>
+  </div>
+
+  <script>
+    const AdminManager = {
+      allOrders: [],
+      activeTables: new Map(),
+
+      init() {
+        this.loadData();
+        this.setupFilters();
+        this.render();
+        document.getElementById('refresh-btn').addEventListener('click', () => this.refresh());
+        document.getElementById('status-filter').addEventListener('change', () => this.renderAllOrders());
+        document.getElementById('mesa-filter').addEventListener('change', () => this.renderAllOrders());
+        window.AdminManager = this;
+      },
+
+      loadData() {
+        try { this.allOrders = JSON.parse(localStorage.getItem('buffetsushi_allOrders')) || []; } catch(e){ this.allOrders = []; }
+        this.activeTables.clear();
+        const mesaActivated = localStorage.getItem('buffetsushi_F5G9H3J6K2L4_mesaActivated') === 'true';
+        const currentMesa = parseInt(localStorage.getItem('buffetsushi_currentMesa')) || null;
+        const personas = parseInt(localStorage.getItem('buffetsushi_F5G9H3J6K2L4_personas')) || 1;
+        let history = [];
+        try { history = JSON.parse(localStorage.getItem('buffetsushi_F5G9H3J6K2L4_history')) || []; } catch(e){ history=[]; }
+
+        for (let i=1;i<=20;i++) {
+          if (mesaActivated && currentMesa === i) {
+            this.activeTables.set(i, { mesaNumber:i, personas, orders: history, timestamp: history[0]?.timestamp || new Date() });
+          } else {
+            this.activeTables.set(i, null);
+          }
+        }
+        return this;
+      },
+
+      render() {
+        this.renderStats();
+        this.renderTables();
+        this.renderAllOrders();
+      },
+
+      renderStats() {
+        const activeCount = Array.from(this.activeTables.values()).filter(m=>m!==null).length;
+        document.getElementById('active-tables-count').textContent = activeCount;
+        document.getElementById('pending-orders-count').textContent = this.allOrders.filter(o=>o.status==='pending').length;
+        document.getElementById('total-orders-count').textContent = this.allOrders.length;
+      },
+
+      renderTables() {
+        const container = document.getElementById('mesa-grid');
+        container.innerHTML = '';
+        for (let i=1;i<=20;i++) {
+          const mesa = this.activeTables.get(i);
+          const card = document.createElement('div');
+          card.className = 'mesa-card '+(mesa?'active':'');
+          if (mesa) {
+            const ordersHTML = mesa.orders.map(order => {
+              const itemsHTML = order.items.map(it=>`<div>${it.quantity} x ${it.name}</div>`).join('');
+              return `<div class='mini-order'><strong>Pedido #${order.id.split('-')[2]}</strong>${itemsHTML}</div>`;
+            }).join('');
+            card.innerHTML = `
+              <div class="mesa-header">
+                <div class="mesa-number">Mesa ${i}</div>
+                <div class="mesa-status active">Activa</div>
+              </div>
+              <div class="mesa-info">
+                <div><i class="fas fa-users"></i> ${mesa.personas} personas</div>
+                <div><i class="fas fa-clock"></i> Desde: ${new Date(mesa.timestamp).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}</div>
+                <div><i class="fas fa-receipt"></i> ${mesa.orders.length} pedidos</div>
+              </div>
+              <div class="mesa-orders">
+                ${ordersHTML}
+              </div>`;
+          } else {
+            card.innerHTML = `
+              <div class="mesa-header">
+                <div class="mesa-number">Mesa ${i}</div>
+                <div class="mesa-status inactive">Libre</div>
+              </div>
+              <div style="text-align:center;padding:18px;color:var(--muted)">
+                <i class="fas fa-chair" style="font-size:1.6rem;margin-bottom:8px;color:var(--inactive)"></i>
+                <div>Mesa disponible</div>
+              </div>`;
+          }
+          container.appendChild(card);
+        }
+      },
+
+      renderAllOrders() {
+        const container = document.getElementById('all-orders');
+        container.innerHTML = '';
+        let filtered = [...this.allOrders];
+        const mesaFilter = document.getElementById('mesa-filter').value;
+        const statusFilter = document.getElementById('status-filter').value;
+        if (mesaFilter!=='all') filtered=filtered.filter(o=>String(o.mesa)===mesaFilter);
+        if (statusFilter!=='all') filtered=filtered.filter(o=>o.status===statusFilter);
+        filtered.sort((a,b)=>new Date(b.timestamp)-new Date(a.timestamp));
+        filtered.forEach((o,idx)=>{
+          const itemsHTML = o.items.map(it=>`<div>${it.quantity} x ${it.name}</div>`).join('');
+          const div = document.createElement('div');
+          div.className='admin-order-card';
+          div.innerHTML=`
+            <div class='admin-order-header'>
+              <div><strong>Pedido #${(o.id||'').split('-')[2]||idx+1}</strong> - Mesa ${o.mesa} - ${o.status}</div>
+              <div class='order-time'>${new Date(o.timestamp).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}</div>
+            </div>
+            <div>${itemsHTML}</div>`;
+          container.appendChild(div);
+        });
+      },
+
+      setupFilters(){
+        const mesaFilter = document.getElementById('mesa-filter');
+        for (let i=1;i<=20;i++){const opt=document.createElement('option'); opt.value=String(i); opt.textContent=`Mesa ${i}`; mesaFilter.appendChild(opt);}
+      },
+
+      refresh(){this.loadData().render();}
+    };
+
+    document.addEventListener('DOMContentLoaded',()=>AdminManager.init());
+  </script>
+</body>
+</html>
