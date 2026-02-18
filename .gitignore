@@ -1,0 +1,35 @@
+# --- OS Metadata ---
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# --- IDEs & Editors ---
+.vscode/
+.idea/
+*.swp
+*.swo
+*.sublime-project
+*.sublime-workspace
+
+# --- Node/Dependencies (Just in case you use them later) ---
+node_modules/
+package-lock.json
+npm-debug.log*
+
+# --- Local Environment & Backups ---
+.env
+*.bak
+*.tmp
+temp/
+backup/
+
+# --- Database & Storage (Local tests) ---
+*.sql
+*.sqlite
+# We ignore local storage exports if you have any
+local_storage_dump.json
+
+# --- Build/Dist (If you use a bundler like Vite or Webpack) ---
+dist/
+build/
+out/
