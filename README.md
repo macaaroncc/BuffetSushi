@@ -75,7 +75,7 @@ index.html?code=H6J1K4L9Z7X2 (for Table 8).
 Staff Access:
 Open admin.html to monitor all active table traffic.
 
-🏴󠁧󠁢󠁳󠁣󠁴󠁿 Professional Value (For Recruiters)
+Professional Value (For Recruiters)
 This project demonstrates proficiency in:
 
 Translating Business Needs to Code: Implementing rules like "X plates per person" is a real-world requirement.
@@ -84,11 +84,3 @@ Full-Stack Thinking: Building both the consumer and provider sides of an applica
 
 UX/UI Excellence: Creating an interface that feels high-end and remains intuitive under the pressure of a busy service.
 
-Perfil de GitHub (Consejo Extra)
-Para que GitHub detecte este proyecto como JavaScript puro, usa el archivo .gitattributes que creamos antes:
-
-Plaintext
-# .gitattributes
-*.html linguist-detectable=false
-*.css linguist-detectable=false
-*.js linguist-detectable=true
