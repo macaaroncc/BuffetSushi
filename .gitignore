@@ -1,35 +1,11 @@
-# --- OS Metadata ---
-.DS_Store
-Thumbs.db
-desktop.ini
+# Ignorar el lenguaje HTML y CSS en las estadísticas
+*.html linguist-detectable=false
+*.css linguist-detectable=false
 
-# --- IDEs & Editors ---
-.vscode/
-.idea/
-*.swp
-*.swo
-*.sublime-project
-*.sublime-workspace
+# Forzar a que GitHub trate los archivos .html como si fueran JavaScript
+# Esto es útil si tienes la lógica dentro de etiquetas <script>
+*.html linguist-language=JavaScript
 
-# --- Node/Dependencies (Just in case you use them later) ---
-node_modules/
-package-lock.json
-npm-debug.log*
-
-# --- Local Environment & Backups ---
-.env
-*.bak
-*.tmp
-temp/
-backup/
-
-# --- Database & Storage (Local tests) ---
-*.sql
-*.sqlite
-# We ignore local storage exports if you have any
-local_storage_dump.json
-
-# --- Build/Dist (If you use a bundler like Vite or Webpack) ---
-dist/
-build/
-out/
+# Asegurar que los archivos .js reales (si los tienes) cuenten al máximo
+*.js linguist-detectable=true
+*.js linguist-language=JavaScript
